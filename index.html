@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Menú Restaurante – Interactivo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(rgba(30, 30, 40, 0.8), rgba(20, 20, 30, 0.8)), url('fondo.png') center/cover fixed;
+            color: #f0f0f5;
+            padding: 2rem 1rem;
+            text-align: center;
+            min-height: 100vh;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+            header img {
+                width: 60px;
+                height: 60px;
+                object-fit: contain;
+                border-radius: 70%; /* cambia a 50% para círculo perfecto */
+                box-shadow: 0 0 12px 4px rgba(255, 230, 100, 0.7); /* subí un poco el resplandor para que resalte */
+            }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-style: italic;
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 8px #222;
+        }
+
+        .top-section {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            align-items: flex-start;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+            .nav button {
+                min-width: 140px;
+                font-size: 1.15rem;
+                padding: 1rem 2rem;
+                border-radius: 30px;
+                color: #ffee99; /* amarillo clarito igual que .sm-btn */
+                background-color: rgba(30, 30, 30, 0.85); /* fondo gris transparente como .sm-btn */
+                border: 1.5px solid #995555; /* borde marrón como .sm-btn */
+                transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: none;
+                cursor: pointer;
+            }
+
+                .nav button.active,
+                .nav button:hover {
+                    background-color: rgba(255, 100, 100, 0.2); /* rojo suave como en .sm-btn:hover */
+                    border-color: #f33636; /* rojo vivo */
+                    color: #ffee99; /* amarillo clarito para que resalte */
+                    box-shadow: 0 0 8px 2px rgba(255, 100, 100, 0.3); /* sombra roja suave */
+                }
+
+        .menu-wrap {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu {
+            display: none;
+            background: rgba(20, 20, 20, 0.75);
+            color: #ddd;
+            padding: 1.2rem 1.5rem;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 560px;
+            box-sizing: border-box;
+            box-shadow: 0 0 8px 2px rgba(255, 100, 100, 0.2);
+            transition: transform 0.3s ease;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+            .menu.show {
+                display: block;
+                transform: scale(1);
+            }
+
+        .sm-btn,
+        .product-btn {
+            position: relative;
+            display: block;
+            width: 100%;
+            padding: 0.9rem 1.5rem;
+            margin: 0.4rem 0;
+            background: rgba(30, 30, 30, 0.85);
+            color: #ffee99;
+            border: 1.5px solid #995555;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: none;
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+            .sm-btn::after {
+                content: '▶';
+                position: absolute;
+                right: 18px;
+                font-weight: 700;
+                color: #cc7777;
+                transition: transform 0.3s ease, color 0.3s ease;
+                font-size: 1.2rem;
+            }
+
+            .sm-btn.active::after {
+                transform: rotate(90deg);
+                color: #ffaaaa;
+            }
+
+            .sm-btn:hover,
+            .product-btn:hover {
+                background: rgba(255, 100, 100, 0.2);
+                border-color: #f33636;
+                box-shadow: 0 0 8px 2px rgba(136, 204, 136, 0.3);
+            }
+
+        .sm-content {
+            display: none;
+            margin: 0.6rem 0 1.2rem 1.3rem;
+            flex-direction: column;
+        }
+
+            .sm-content.show {
+                display: flex;
+            }
+
+        .product-info {
+            display: none;
+            margin-top: 1.2rem;
+            background: rgba(15, 15, 15, 0.75);
+            color: #ffffff;
+            padding: 1rem 1.4rem;
+            border-radius: 12px;
+            text-align: left;
+            box-shadow: 0 0 12px 4px rgba(255, 100, 100, 0.2);
+            transition: opacity 0.4s ease;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+            .product-info.show {
+                display: block;
+            }
+
+        .info-flex {
+            display: flex;
+            gap: 1.2rem;
+            align-items: start;
+            flex-wrap: wrap;
+        }
+
+            .info-flex img {
+                width: 130px;
+                height: 130px;
+                object-fit: cover;
+                border-radius: 10px;
+                box-shadow: 0 0 10px 3px rgba(100, 200, 100, 0.15);
+                flex-shrink: 0;
+            }
+
+        .horarios {
+            background: rgba(20, 20, 20, 0.75);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            max-width: 560px;
+            margin: 2rem auto 0 auto;
+            color: #ddd;
+            text-align: left;
+            box-shadow: 0 0 8px 2px rgba(255, 100, 100, 0.2);
+            font-weight: 600;
+        }
+
+            .horarios h2 {
+                margin-top: 0;
+                margin-bottom: 0.8rem;
+                font-size: 1.4rem;
+                text-align: center;
+                color: #ffbbbb;
+                text-shadow: 0 0 4px #ff5555;
+            }
+
+            .horarios p {
+                margin: 0.3rem 0;
+                font-size: 1rem;
+            }
+
+        /* Responsive tweaks */
+        @media (max-width: 700px) {
+            body {
+                padding: 1rem 0.6rem;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+                header img {
+                    width: 50px;
+                    height: 50px;
+                }
+
+            h1 {
+                font-size: 2.2rem;
+                letter-spacing: 1.5px;
+            }
+
+            .top-section {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .nav {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+                .nav button {
+                    min-width: 140px;
+                    font-size: 1.15rem;
+                    padding: 1rem 2rem;
+                    border-radius: 30px;
+                }
+
+            .menu-wrap {
+                justify-content: center;
+            }
+
+            .menu {
+                max-width: 100%;
+                max-height: 50vh;
+                padding: 1rem;
+            }
+
+            .sm-btn,
+            .product-btn {
+                font-size: 1.15rem;
+                padding: 1rem 1.4rem;
+                margin: 0.5rem 0;
+            }
+
+                .sm-btn::after {
+                    font-size: 1.3rem;
+                    right: 14px;
+                }
+
+            .product-info {
+                max-width: 100%;
+                padding: 1rem 1rem;
+                margin: 1.5rem auto 0 auto;
+            }
+
+            .info-flex {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+                .info-flex img {
+                    width: 110px;
+                    height: 110px;
+                    margin-bottom: 1rem;
+                }
+
+            .horarios {
+                max-width: 95%;
+                text-align: center;
+                font-size: 1.05rem;
+                margin: 1.5rem auto 0 auto;
+            }
+
+                .horarios p {
+                    margin: 0.25rem 0;
+                }
+        }
+
+        .menu-wrap,
+        .horarios,
+        .product-info {
+            visibility: hidden;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            transition: opacity 0.3s ease, height 0.3s ease;
+        }
+
+        header p.subtitulo {
+            margin: 0;
+            font-size: 1rem;
+            color: #ffcc66; /* un amarillo cálido */
+            font-style: italic;
+            text-shadow: 0 0 5px #aa6600;
+        }
+
+        .title-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* para centrar el texto */
+        }
+
+        .aviso-bebidas {
+            margin-top: 0.rem;
+            margin-bottom: 0.2rem;
+            font-size: 0.8rem;
+            color: #ffcc66;
+            font-style: italic;
+            text-shadow: 0 0 5px #aa6600;
+        }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="logo.png" alt="Logo Takitos Rossy" />
+        <div class="title-container">
+            <h1>Takitos Rossy</h1>
+            <p class="subtitulo">Rico menudo y barbacoa</p>
+        </div>
+    </header>
+
+    <div class="top-section">
+        <nav class="nav">
+            <button id="entreBtn">LUNES A VIERNES</button>
+            <button id="fdsBtn">LUNES A DOMINGO</button>
+            <button id="especialBtn">OTROS DÍAS</button>
+        </nav>
+    </div>
+
+    <p id="bebidasAviso" class="aviso-bebidas">
+        Se prohíbe la entrada con bebidas (Se cobrará descorche).
+    </p>
+
+    <div class="menu-wrap">
+
+        <!-- LUNES A VIERNES -->
+
+        <div id="entreMenu" class="menu show">
+
+            <button class="sm-btn" data-target="desayunosSm">DESAYUNOS</button>
+            <div id="desayunosSm" class="sm-content">
+                <button class="product-btn" data-img="img/Motulenos.png" data-title="Motuleños" data-desc="Huevos estrellados con tortilla semi dorada y salsa con trocitos de jamón.">Motuleños</button>
+                <button class="product-btn" data-img="img/Rancheros.png" data-title="Rancheros" data-desc="Huevos estrellados con salsa a la mexicana.">Rancheros</button>
+                <button class="product-btn" data-img="img/Divorciados.png" data-title="Divorciados" data-desc="Huevos estrellados en salsa roja y verde, separados por frijolitos con queso.">Divorciados</button>
+                <button class="product-btn" data-img="img/ConJamon.png" data-title="Con jamón" data-desc="Huevos revueltos acompañados de trocitos de jamón.">Con jamón</button>
+                <button class="product-btn" data-img="img/ConTocino.png" data-title="Con tocino" data-desc="Huevos revueltos con crujiente tocino.">Con tocino</button>
+                <button class="product-btn" data-img="img/ConMachaca.png" data-title="Con chorizo" data-desc="Huevos revuletos con chorizo tradicional.">Con tocino</button>
+                <button class="product-btn" data-img="img/AlaMex.png" data-title="A la mexicana" data-desc="Huevos con jitomate, cebolla y chile.">A la mexicana</button>
+                <button class="product-btn" data-img="img/ChilaquilesV.png" data-title="Chilaquiles" data-desc="Platillo tradicional mexicano a base de totopos con salsa roja o verde.">Chilaquiles</button>
+
+            </div>
+
+            <button class="sm-btn" data-target="TacosGSm">TACOS Y GORDITAS</button>
+            <div id="TacosGSm" class="sm-content">
+                <button class="product-btn" data-img="img/TacosH.png" data-title="Tacos de Harina" data-desc="Taquitos con tortilla de Harina para que almuerce el muñeco. ">Tacos de Harina</button>
+                <button class="product-btn" data-img="img/TacosM.png" data-title="Tacos de Maíz" data-desc="Taquitos clásicos con tortilla de maíz bien mexicano.">Tacos de Maíz</button>
+                <button class="product-btn" data-img="img/GorditasH.png" data-title="Gorditas de Harina" data-desc="Gorditas de harina bien rellenas de su respectivo guiso.">Gorditas de Harina</button>
+                <button class="product-btn" data-img="img/GorditasM.png" data-title="Gorditas de Maíz" data-desc="Que sean de maíz no las hace fit, ¡Pidelas bien gordas!.">Gorditas de Maíz</button>
+
+
+                <button class="sm-btn" data-target="GuisosSm">Variedad de Guisos</button>
+                <div id="GuisosSm" class="sm-content">
+                    <button class="product-btn" data-img="img/Barbacoa.png" data-title="Barbacoa" data-desc="La mejor Barbacoa de Ramos, picada y mezclada por los mejores picadores de la región.">Barbacoa</button>
+                    <button class="product-btn" data-img="img/Deshebrada.png" data-title="Deshebrada" data-desc="Carne de Res en hebras finas y jugosas que acarician tu paladar.">Deshebrada</button>
+                    <button class="product-btn" data-img="img/Chicharron.png" data-title="Chicharrón Prensado" data-desc="Chicharrón Prensado en guiso rojo, suave y sabroso como ningún otro.">Chicharrón Prensado</button>
+                    <button class="product-btn" data-img="img/Discada.png" data-title="Discada" data-desc="Combinación de salchica, cebolla, jitomate y demás sabores por descubrir.">Discada</button>
+                    <button class="product-btn" data-img="img/Asado.png" data-title="Asado rojo de puerco" data-desc="Pierna de puerco cortada en trozos, frita y guisada en una mezcla de chile rojo.">Asado rojo de puerco</button>
+                    <button class="product-btn" data-img="img/Frijoles.png" data-title="Frijoles con queso" data-desc="Tradicionales Frijolitos refritos acompañados de un buen quesito para degustar.">Frijoles con queso</button>
+                    <button class="product-btn" data-img="img/Rajas.png" data-title="Rajas con queso" data-desc="Combinación de colores mexicanos (Verde, blanco y rojo) de chile poblano y queso panela.">Rajas con queso</button>
+                    <button class="product-btn" data-img="img/CortadilloG.png" data-title="Cortadillo" data-desc="Guiso tradicional a base de carne de res en trozos pequeños, cocinada lentamente en salsa de jitomate con papas, chile, cebolla y especias.">Cortadillo</button>
+                    <button class="product-btn" data-img="img/Papa.png" data-title="Guisado de papa" data-desc="Guisado de papa con mantequilla para degustar algo suave, ligero y sabroso.">Guisado de papa</button>
+                    <button class="product-btn" data-img="img/Picadillo.png" data-title="Picadillo" data-desc="Carne molina con papa, combinación de proteina y carbohidratos, ideal para niños y para mantener la figura.">Picadillo</button>
+                    <button class="product-btn" data-img="img/Huevo.png" data-title="Huevo en salsa" data-desc="Huevos cocinados en una rica salsa de jitomate y chile, con un toque de cebolla y ajo. Una receta casera, sencilla pero llena de sabor.">Huevo en salsa</button>
+                    <button class="product-btn" data-img="img/Huevo_chorizo.png" data-title="Huevo con chorizo" data-desc="Huevos revueltos con chorizo doradito, preparados al momento. Un platillo clásico mexicano.">Huevo con chorizo</button>
+                    <button class="product-btn" data-img="img/Huevo_jamon.png" data-title="Huevo con jamón" data-desc="Huevos revueltos con jamón, cocinados al momento con un toque de mantequilla.">Huevo con jamón</button>
+                    <!-- Agrega aquí resto de productos -->
+                </div>
+            </div>
+
+            <button class="sm-btn" data-target="barbacoa2Sm">BARBACOA</button>
+            <div id="barbacoa2Sm" class="sm-content">
+                <button class="product-btn" data-img="img/Barbacoa_plato.png" data-title="Comer aquí" data-desc="La mejor barbacoa de Ramos y Saltillo, picada por los mejores de la región. Pidela a partir de 1/2Kg, acompañada de tortillas de maíz, harina, verdura, limón y salstias roja y verde.">Comer aquí </button>
+                <button class="product-btn" data-img="img/Barbacoa_plato.png" data-title="Para llevar" data-desc="La mejor barbacoa de Ramos y Saltillo, picada por los mejores de la región. Pidela a partir de 1/4Kg acompañada de tortillas, limón, verdura y salsitas roja y verde." .>Para llevar</button>
+            </div>
+
+            <button class="sm-btn" data-target="menudoSm">MENUDO</button>
+            <div id="menudoSm" class="sm-content">
+                <button class="product-btn" data-img="img/MenudoG.png" data-title="Menudo Grande" data-desc="Rico menudo, considerado por muchos el mejor de Ramos, calidadad y sabor Takitos Rossy. plato grande 3/4 de Litro - $110.">Menudo Grande</button>
+                <button class="product-btn" data-img="img/MenudoC.png" data-title="Menudo Chico" data-desc="Rico menudo, considerado por muchos el mejor de Ramos, calidadad y sabor Takitos Rossy. plato chico 1/2 Litro - $90" .>Menudo Chico</button>
+            </div>
+
+            <button class="sm-btn" data-target="platilloSm">PLATILLOS</button>
+            <div id="platilloSm" class="sm-content">
+                <button class="product-btn" data-img="img/CaldoRes.png" data-title="Caldo de Res" data-desc="Caldo de Res bien caliente para acompañar con Coca bien helada.">Caldo de Res</button>
+                <button class="product-btn" data-img="img/MilaPollo.png" data-title="Milanesa de Pollo" data-desc="Pechuga de Pollo fileteada y empanizada. Acompañada con 4 guarniciones.">Milanesa de Pollo</button>
+                <button class="product-btn" data-img="img/MilaRes.png" data-title="Milanesa de Res" data-desc="Milanesa de Res empanizada. Acompañada con 4 guarniciones.">Milanesa de Res</button>
+                <button class="product-btn" data-img="img/ChilePica.png" data-title="Chile relleno de Picadillo" data-desc="Chile poblano relleno de picadillo de res y capeado con huevo. Acompañado con 4 guarniciones.">Chile Relleno de Picadillo</button>
+                <button class="product-btn" data-img="img/ChileQueso.png" data-title="Chile relleno de Queso" data-desc="Chile poblano relleno de queso y capeado con huevo. Acompañado con 4 guarniciones.">Chile Relleno de Queso</button>
+                <button class="product-btn" data-img="img/AsadoP.png" data-title="Asado de Puerco" data-desc="Pierna de puerco cortada en trozos, frita y guisada en una mezcla de chile rojo, acompañada de arroz y frijol.">Asado de Puerco</button>
+                <button class="product-btn" data-img="img/Cortadillo.png" data-title="Cortadillo de Res" data-desc="Milanesa de res guisada con tomate, cebolla y chiles verdes. Acompañado con arroz y frijol.">Cortadillo de Res</button>
+
+            </div>
+
+            <button class="sm-btn" data-target="mariscosSm">MARISCOS</button>
+            <div id="mariscosSm" class="sm-content">
+                <button class="product-btn" data-img="img/Enchipotlados.png" data-title="Camarones enchipotlados" data-desc="Camarones cocidos y bañados en salsa de chipotle acompañado con 3 guarniciones.">Camarones enchipotlados</button>
+                <button class="product-btn" data-img="img/Aladiabla.png" data-title="Camarones al mojo de ajo" data-desc="Camarones frescos preparados al mojo de ajo: salteados en mantequilla con ajo dorado y especias.">Camarones al mojo de ajo</button>
+                <button class="product-btn" data-img="img/CoctelM.png" data-title="Coctel de camarón chico" data-desc="Camarones jugosos en su punto, bañados en una mezcla especial de salsa coctelera con jitomate, cilantro, cebolla. 200ml.">Cóctel de Camarón Chico</button>
+                <button class="product-btn" data-img="img/CoctelG.png" data-title="Cóctel de Camarón Grande" data-desc="Camarones jugosos en su punto, bañados en una mezcla especial de salsa coctelera con jitomate, cilantro, cebolla. 500ml.">Cóctel de Camarón Grande</button>
+            </div>
+
+            <button class="sm-btn" data-target="bebidasSm">BEBIDAS</button>
+            <div id="bebidasSm" class="sm-content">
+                <button class="product-btn" data-img="img/AguaNat.png" data-title="Agua Natural" data-desc="Botella de Agua Natural.">Agua Natural</button>
+
+
+
+                <button class="sm-btn" data-target="AguasSm">Aguas de Frutas</button>
+                <div id="AguasSm" class="sm-content">
+                    <button class="product-btn" data-img="img/AguaMedio.png" data-title="Agua de Medio Litro" data-desc="Agua de frutas naturales en vaso de medio litro.">Vaso de Medio Litro</button>
+                    <button class="product-btn" data-img="img/AguaLitro.png" data-title="Agua de Litro" data-desc="Agua de frutas naturales en vaso de litro.">Vaso de Litro</button>
+
+                </div>
+
+                <button class="sm-btn" data-target="RefrescosSm">Refrescos</button>
+                <div id="RefrescosSm" class="sm-content">
+                    <button class="product-btn" data-img="img/refresco355.png" data-title="Refresco de 355ml" data-desc="Variedad de refresco/jugo de 355ml de la familia CocaCola.">Refresco de 355ml</button>
+                    <button class="product-btn" data-img="img/refresco600.png" data-title="Refresco de 600ml" data-desc="Variedad de refresco/jugo de 600ml de la familia CocaCola.">Refresco de 600ml</button>
+                </div>
+
+            </div>
+
+            <button class="sm-btn" data-target="extrasSm">EXTRAS</button>
+            <div id="extrasSm" class="sm-content">
+                <button class="product-btn" data-img="img/Pan.png" data-title="Pieza extra de Pan" data-desc="Pieza extra de Pan.">Pieza extra de Pan</button>
+                <button class="product-btn" data-img="img/TortH.png" data-title="1/2Kg de Tortillas de Harina" data-desc="Extra de Tortillas de Harina">1/2Kg de Tortillas de Harina</button>
+                <button class="product-btn" data-img="img/Descorche.png" data-title="Descorche" data-desc="Si gusta mantener la bebida que trajo de afuera, se cobrará como descorche.">Descorche</button>
+
+            </div>
+
+        </div>
+        <div id="fdsMenu" class="menu">
+
+            <!-- LUNES A DOMINGO -->
+            <button class="sm-btn" data-target="Tacos2GSm">TACOS Y GORDITAS</button>
+            <div id="Tacos2GSm" class="sm-content">
+                <button class="product-btn" data-img="img/TacosH.png" data-title="Tacos de Harina" data-desc="Taquitos con tortilla de Harina para que almuerce el muñeco. ">Tacos de Harina</button>
+                <button class="product-btn" data-img="img/TacosM.png" data-title="Tacos de Maíz" data-desc="Taquitos clásicos con tortilla de maíz bien mexicano.">Tacos de Maíz</button>
+                <button class="product-btn" data-img="img/GorditasH.png" data-title="Gorditas de Harina" data-desc="Gorditas de harina bien rellenas de su respectivo guiso.">Gorditas de Harina</button>
+                <button class="product-btn" data-img="img/GorditasM.png" data-title="Gorditas de Maíz" data-desc="Que sean de maíz no las hace fit, ¡Pidelas bien gordas!.">Gorditas de Maíz</button>
+
+
+                <button class="sm-btn" data-target="Guisos2Sm">Variedad de Guisos</button>
+                <div id="Guisos2Sm" class="sm-content">
+                    <button class="product-btn" data-img="img/Barbacoa.png" data-title="Barbacoa" data-desc="La mejor Barbacoa de Ramos, picada y mezclada por los mejores picadores de la región.">Barbacoa</button>
+                    <button class="product-btn" data-img="img/Deshebrada.png" data-title="Deshebrada" data-desc="Carne de Res en hebras finas y jugosas que acarician tu paladar.">Deshebrada</button>
+                    <button class="product-btn" data-img="img/Chicharron.png" data-title="Chicharrón Prensado" data-desc="Chicharrón Prensado en guiso rojo, suave y sabroso como ningún otro.">Chicharrón Prensado</button>
+                    <button class="product-btn" data-img="img/Discada.png" data-title="Discada" data-desc="Combinación de salchica, cebolla, jitomate y demás sabores por descubrir.">Discada</button>
+                    <button class="product-btn" data-img="img/Asado.png" data-title="Asado rojo de puerco" data-desc="Pierna de puerco cortada en trozos, frita y guisada en una mezcla de chile rojo.">Asado rojo de puerco</button>
+                    <button class="product-btn" data-img="img/Frijoles.png" data-title="Frijoles con queso" data-desc="Tradicionales Frijolitos refritos acompañados de un buen quesito para degustar.">Frijoles con queso</button>
+                    <button class="product-btn" data-img="img/Rajas.png" data-title="Rajas con queso" data-desc="Combinación de colores mexicanos (Verde, blanco y rojo) de chile poblano y queso panela.">Rajas con queso</button>
+                    <button class="product-btn" data-img="img/CortadilloG.png" data-title="Cortadillo" data-desc="Guiso tradicional a base de carne de res en trozos pequeños, cocinada lentamente en salsa de jitomate con papas, chile, cebolla y especias.">Cortadillo</button>
+                    <button class="product-btn" data-img="img/Papa.png" data-title="Guisado de papa" data-desc="Guisado de papa con mantequilla para degustar algo suave, ligero y sabroso.">Guisado de papa</button>
+                    <button class="product-btn" data-img="img/Picadillo.png" data-title="Picadillo" data-desc="Carne molina con papa, combinación de proteina y carbohidratos, ideal para niños y para mantener la figura.">Picadillo</button>
+                    <button class="product-btn" data-img="img/Huevo.png" data-title="Huevo en salsa" data-desc="Huevos cocinados en una rica salsa de jitomate y chile, con un toque de cebolla y ajo. Una receta casera, sencilla pero llena de sabor.">Huevo en salsa</button>
+                    <button class="product-btn" data-img="img/Huevo_chorizo.png" data-title="Huevo con chorizo" data-desc="Huevos revueltos con chorizo doradito, preparados al momento. Un platillo clásico mexicano.">Huevo con chorizo</button>
+                    <button class="product-btn" data-img="img/Huevo_jamon.png" data-title="Huevo con jamón" data-desc="Huevos revueltos con jamón, cocinados al momento con un toque de mantequilla.">Huevo con jamón</button>
+                    <!-- Agrega aquí resto de productos -->
+                </div>
+            </div>
+
+            <button class="sm-btn" data-target="menudo2Sm">MENUDO</button>
+            <div id="menudo2Sm" class="sm-content">
+                <button class="product-btn" data-img="img/MenudoG.png" data-title="Menudo Grande" data-desc="Rico menudo, considerado por muchos el mejor de Ramos, calidadad y sabor Takitos Rossy. plato grande 3/4 de Litro - $110.">Menudo Grande</button>
+                <button class="product-btn" data-img="img/MenudoC.png" data-title="Menudo Chico" data-desc="Rico menudo, considerado por muchos el mejor de Ramos, calidadad y sabor Takitos Rossy. plato chico 1/2 Litro - $90" .>Menudo Chico</button>
+            </div>
+
+            <button class="sm-btn" data-target="barbacoaSm">BARBACOA</button>
+            <div id="barbacoaSm" class="sm-content">
+                <button class="product-btn" data-img="img/Barbacoa_plato.png" data-title="Comer aquí" data-desc="La mejor barbacoa de Ramos y Saltillo, picada por los mejores de la región. Pidela a partir de 1/2Kg, acompañada de tortillas de maíz, harina, verdura, limón y salstias roja y verde.">Comer aquí </button>
+                <button class="product-btn" data-img="img/Barbacoa_plato.png" data-title="Para llevar" data-desc="La mejor barbacoa de Ramos y Saltillo, picada por los mejores de la región. Pidela a partir de 1/4Kg acompañada de tortillas, limón, verdura y salsitas roja y verde." .>Para llevar</button>
+            </div>
+
+            <button class="sm-btn" data-target="bebidas2Sm">BEBIDAS</button>
+            <div id="bebidas2Sm" class="sm-content">
+                <button class="product-btn" data-img="img/AguaNat.png" data-title="Agua Natural" data-desc="Botella de Agua Natural.">Agua Natural</button>
+
+                <button class="sm-btn" data-target="Aguas2Sm">Aguas de Frutas</button>
+                <div id="Aguas2Sm" class="sm-content">
+                    <button class="product-btn" data-img="img/AguaMedio.png" data-title="Agua de Medio Litro" data-desc="Agua de frutas naturales en vaso de medio litro.">Vaso de Medio Litro</button>
+                    <button class="product-btn" data-img="img/AguaLitro.png" data-title="Agua de Litro" data-desc="Agua de frutas naturales en vaso de litro.">Vaso de Litro</button>
+
+                </div>
+
+                <button class="sm-btn" data-target="Refrescos2Sm">Refrescos</button>
+                <div id="Refrescos2Sm" class="sm-content">
+                    <button class="product-btn" data-img="img/refresco355.png" data-title="Refresco de 355ml" data-desc="Variedad de refresco/jugo de 355ml de la familia CocaCola.">Refresco de 355ml</button>
+                    <button class="product-btn" data-img="img/refresco600.png" data-title="Refresco de 600ml" data-desc="Variedad de refresco/jugo de 600ml de la familia CocaCola.">Refresco de 600ml</button>
+                </div>
+
+            </div>
+
+            <button class="sm-btn" data-target="extras2Sm">EXTRAS</button>
+            <div id="extras2Sm" class="sm-content">
+                <button class="product-btn" data-img="img/Pan.png" data-title="Pieza extra de Pan" data-desc="Pieza extra de Pan.">Pieza extra de Pan</button>
+                <button class="product-btn" data-img="img/TortH.png" data-title="1/2Kg de Tortillas de Harina" data-desc="Extra de Tortillas de Harina">1/2Kg de Tortillas de Harina</button>
+                <button class="product-btn" data-img="img/Descorche.png" data-title="Descorche" data-desc="Si gusta mantener la bebida que trajo de afuera, se cobrará como descorche.">Descorche</button>
+
+            </div>
+
+        </div>
+
+        <div id="especialMenu" class="menu">
+
+            <!-- OTROS DIAS -->
+            <button class="sm-btn" data-target="lunesSm">LUNES</button>
+            <div id="lunesSm" class="sm-content">
+                <button class="product-btn" data-img="img/BistecEnc.png" data-title="Bistec encebollado" data-desc="Bistec suave de res acompañado con cebolla salteada al punto.">Bistec encebollado</button>
+            </div>
+
+            <button class="sm-btn" data-target="martesSm">MARTES</button>
+            <div id="martesSm" class="sm-content">
+                <button class="product-btn" data-img="img/Enchiladas.png" data-title="Enchiladas rellenas de pollo" data-desc="Tortillas de maíz rellenas de pollo deshebrado, bañadas en salsa roja o verde y gratinadas con queso.">Enchiladas rellenas de pollo</button>
+                <button class="product-btn" data-img="img/Enmoladas.png" data-title="Enmoladas rellenas de pollo" data-desc="Tortillas de maíz rellenas de pollo deshebrado, bañadas en mole casero y decoradas con ajonjolí, crema, queso fresco y cebolla.">Enmoladas rellenas de pollo</button>
+            </div>
+
+            <button class="sm-btn" data-target="miercolesSm">MIÉRCOLES</button>
+            <div id="miercolesSm" class="sm-content">
+                <button class="product-btn" data-img="img/Albondigas.png" data-title="Albondigas rellenas de queso" data-desc="Albóndigas de carne molida preparadas con especias y rellenas de queso derretido, cocidas en una salsa casera de jitomate.">Albondigas rellenas de queso</button>
+            </div>
+
+            <button class="sm-btn" data-target="juevesSm">JUEVES</button>
+            <div id="juevesSm" class="sm-content">
+                <button class="product-btn" data-img="img/BistecEnc.png" data-title="Bistec encebollado" data-desc="Bistec suave de res acompañado con cebolla salteada al punto.">Bistec encebollado</button>
+                <button class="product-btn" data-img="img/SopaMar.png" data-title="Sopa de mariscos" data-desc="Mezcla de ostión, surimi, pulpu, camarón y trozos de filete en caldo.">Sopa de mariscos</button>
+            </div>
+
+
+        </div>
+
+        </div>
+
+        <section class="horarios" id="horariosInfo">
+            <h2>Horarios</h2>
+            <p><strong>Tacos y gorditas:</strong> Todo el día</p>
+            <p><strong>Menudo:</strong> Todo el día</p>
+            <p><strong>Bebidas:</strong> Todo el día</p>
+            <p><strong>Desayunos:</strong> 8:00am - 11:30pm</p>
+            <p><strong>Platillos:</strong> 10:30am - 3:00pm</p>
+            <p><strong>Mariscos:</strong> 10:30am - 3:00pm</p>
+            <p id="bebidasAvisoHorarios" style="text-align:center; margin-top:10px; display:none;">
+                Se prohíbe la entrada con bebidas (Se cobrará descorche)
+            </p>
+
+        </section>
+
+        <div id="prodInfo" class="product-info">
+            <div class="info-flex">
+                <img id="prodImg" src="" alt="" />
+                <div>
+                    <h3 id="prodTitle"></h3>
+                    <p id="prodDesc"></p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const menuWrap = document.querySelector('.menu-wrap');
+            const horarios = document.querySelector('.horarios');
+
+            menuWrap.style.visibility = 'hidden';
+            menuWrap.style.opacity = '0';
+            menuWrap.style.height = '0';
+            menuWrap.style.overflow = 'hidden';
+
+            horarios.style.visibility = 'hidden';
+            horarios.style.opacity = '0';
+            horarios.style.height = '0';
+            horarios.style.overflow = 'hidden';
+
+            const entreBtn = document.getElementById('entreBtn'),
+                fdsBtn = document.getElementById('fdsBtn'),
+                especialBtn = document.getElementById('especialBtn'),
+                entreMenu = document.getElementById('entreMenu'),
+                fdsMenu = document.getElementById('fdsMenu'),
+                especialMenu = document.getElementById('especialMenu'),
+                prodInfo = document.getElementById('prodInfo'),
+                horariosInfo = document.getElementById('horariosInfo'),
+                avisoBebidas = document.getElementById('bebidasAvisoHorarios');
+
+            function resetAll(except = null) {
+                document.querySelectorAll('.sm-btn').forEach(btn => {
+                    if (btn !== except && !btn.contains(except) && !(except && except.contains(btn))) {
+                        btn.classList.remove('active');
+                    }
+                });
+                document.querySelectorAll('.sm-content').forEach(content => {
+                    if (!except || (!content.contains(except) && !(except && except.contains(content)))) {
+                        content.classList.remove('show');
+                    }
+                });
+                if (!except) {
+                    prodInfo.classList.remove('show');
+                }
+            }
+
+            function actualizarHorarios(tipo) {
+                // Borra todos los hijos de horariosInfo EXCEPTO el aviso
+                Array.from(horariosInfo.children).forEach(el => {
+                    if (el.id !== 'bebidasAvisoHorarios') {
+                        horariosInfo.removeChild(el);
+                    }
+                });
+
+                const contenido = document.createElement('div');
+                contenido.innerHTML = (tipo === 'entre') ? `
+                        <h2>Horarios</h2>
+                        <p><strong>Tacos y gorditas:</strong> Todo el día</p>
+                        <p><strong>Barbacoa:</strong> Todo el día</p>
+                        <p><strong>Menudo:</strong> Todo el día</p>
+                        <p><strong>Bebidas:</strong> Todo el día</p>
+                        <p><strong>Desayunos:</strong> 8:00am - 11:30pm</p>
+                        <p><strong>Platillos:</strong> 10:30am - 3:00pm</p>
+                        <p><strong>Mariscos:</strong> 10:30am - 3:00pm</p>
+                    ` : `
+                        <h2>Horarios</h2>
+                        <p><strong>Tacos y gorditas:</strong> Todo el día</p>
+                        <p><strong>Menudo:</strong> Todo el día</p>
+                        <p><strong>Barbacoa:</strong> Todo el día</p>
+                        <p><strong>Bebidas:</strong> Todo el día</p>
+                    `;
+
+                // Insertamos el nuevo contenido antes del aviso
+                horariosInfo.insertBefore(contenido, avisoBebidas);
+            }
+
+            entreBtn.addEventListener('click', () => {
+                entreBtn.classList.add('active');
+                fdsBtn.classList.remove('active');
+                especialBtn.classList.remove('active');
+                entreMenu.classList.add('show');
+                fdsMenu.classList.remove('show');
+                especialMenu.classList.remove('show');
+                resetAll();
+
+                menuWrap.style.visibility = 'visible';
+                menuWrap.style.opacity = '1';
+                menuWrap.style.height = 'auto';
+                menuWrap.style.overflow = 'visible';
+
+                horarios.style.visibility = 'visible';
+                horarios.style.opacity = '1';
+                horarios.style.height = 'auto';
+                horarios.style.overflow = 'visible';
+
+                actualizarHorarios('entre');
+            });
+
+            fdsBtn.addEventListener('click', () => {
+                fdsBtn.classList.add('active');
+                entreBtn.classList.remove('active');
+                especialBtn.classList.remove('active');
+                fdsMenu.classList.add('show');
+                entreMenu.classList.remove('show');
+                especialMenu.classList.remove('show');
+                resetAll();
+
+                menuWrap.style.visibility = 'visible';
+                menuWrap.style.opacity = '1';
+                menuWrap.style.height = 'auto';
+                menuWrap.style.overflow = 'visible';
+
+                horarios.style.visibility = 'visible';
+                horarios.style.opacity = '1';
+                horarios.style.height = 'auto';
+                horarios.style.overflow = 'visible';
+
+                actualizarHorarios('fds');
+            });
+
+            especialBtn.addEventListener('click', () => {
+                fdsBtn.classList.remove('active');
+                entreBtn.classList.remove('active');
+                especialBtn.classList.add('active');
+                fdsMenu.classList.remove('show');
+                entreMenu.classList.remove('show');
+                especialMenu.classList.add('show');
+                resetAll();
+
+                menuWrap.style.visibility = 'visible';
+                menuWrap.style.opacity = '1';
+                menuWrap.style.height = 'auto';
+                menuWrap.style.overflow = 'visible';
+
+                horarios.style.visibility = 'visible';
+                horarios.style.opacity = '1';
+                horarios.style.height = 'auto';
+                horarios.style.overflow = 'visible';
+
+                actualizarHorarios('especial');
+            });
+
+            document.querySelectorAll('.sm-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tgt = btn.dataset.target;
+                    if (!tgt) return;
+                    const el = document.getElementById(tgt);
+                    if (!el) return;
+                    const isActive = btn.classList.contains('active');
+
+                    if (isActive) {
+                        btn.classList.remove('active');
+                        el.classList.remove('show');
+                    } else {
+                        resetAll(btn);
+                        btn.classList.add('active');
+                        el.classList.add('show');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.product-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('prodTitle').textContent = btn.dataset.title;
+                    document.getElementById('prodDesc').textContent = btn.dataset.desc;
+                    document.getElementById('prodImg').src = btn.dataset.img || '';
+                    prodInfo.classList.add('show');
+                });
+            });
+        </script>
+        <div id="lightbox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
+            <div style="position:relative; max-width:90%; max-height:90%; background:#222; padding:1.5rem; border-radius:12px; text-align:center; color:#fff;">
+                <button id="closeLightbox" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:1.5rem; color:#fff; cursor:pointer;">✕</button>
+                <img id="lightboxImg" src="" alt="" style="max-width:300px; max-height:300px; border-radius:8px; margin-bottom:1rem;">
+                <h3 id="lightboxTitle"></h3>
+                <p id="lightboxDesc" style="margin-bottom:1rem;"></p>
+                <div style="display:flex; justify-content:space-between; margin-top:1rem;">
+                    <button id="prevProduct" style="background:#444; border:none; padding:0.5rem 1rem; color:#fff; border-radius:6px; cursor:pointer;">◀</button>
+                    <button id="nextProduct" style="background:#444; border:none; padding:0.5rem 1rem; color:#fff; border-radius:6px; cursor:pointer;">▶</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            let currentBtn = null;
+            let btnList = [];
+
+            document.querySelectorAll('.product-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btnList = Array.from(btn.parentElement.querySelectorAll('.product-btn'));
+                    currentBtn = btn;
+                    showLightbox(btn);
+                });
+            });
+
+            function showLightbox(btn) {
+                document.getElementById('lightboxTitle').textContent = btn.dataset.title;
+                document.getElementById('lightboxDesc').textContent = btn.dataset.desc;
+                document.getElementById('lightboxImg').src = btn.dataset.img;
+                document.getElementById('lightbox').style.display = 'flex';
+            }
+
+            document.getElementById('closeLightbox').addEventListener('click', () => {
+                document.getElementById('lightbox').style.display = 'none';
+                currentBtn = null;
+            });
+
+            document.getElementById('prevProduct').addEventListener('click', () => {
+                if (!currentBtn || btnList.length === 0) return;
+                const idx = btnList.indexOf(currentBtn);
+                if (idx > 0) {
+                    currentBtn = btnList[idx - 1];
+                    showLightbox(currentBtn);
+                } else {
+                    // Si ya está en el primer producto, cerrar
+                    document.getElementById('lightbox').style.display = 'none';
+                    currentBtn = null;
+                }
+            });
+
+            document.getElementById('nextProduct').addEventListener('click', () => {
+                if (!currentBtn || btnList.length === 0) return;
+                const idx = btnList.indexOf(currentBtn);
+                if (idx < btnList.length - 1) {
+                    currentBtn = btnList[idx + 1];
+                    showLightbox(currentBtn);
+                } else {
+                    document.getElementById('lightbox').style.display = 'none';
+                    currentBtn = null;
+                }
+            });
+
+            // Cierra el lightbox si se hace clic fuera del contenido
+            document.getElementById('lightbox').addEventListener('click', (e) => {
+                if (e.target.id === 'lightbox') {
+                    document.getElementById('lightbox').style.display = 'none';
+                    currentBtn = null;
+                }
+            });
+        </script>
+</body>
+</html>
